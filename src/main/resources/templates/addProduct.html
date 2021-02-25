@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login Form</title>
+    <!-- FONTS & ICONS  -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&family=Roboto:wght@300&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <style>
+        .login-form {
+            width: 340px;
+            margin: 50px auto;
+            font-size: 15px;
+            background-color: #141414;
+        }
+        .login-form form {
+            margin-bottom: 15px;
+            background: #f7f7f7;
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        .login-form h2 {
+            margin: 0 0 15px;
+        }
+        .form-control, .btn {
+            min-height: 38px;
+            border-radius: 2px;
+        }
+        .btn {
+            font-size: 15px;
+            font-weight: bold;
+            background: #2575fc;
+            background: -webkit-linear-gradient(right, #6a11cb, #2575fc);
+            background: -o-linear-gradient(right, #6a11cb, #2575fc);
+            background: -moz-linear-gradient(right, #6a11cb, #2575fc);
+            background: linear-gradient(right, #6a11cb, #2575fc);
+        }
+    </style>
+</head>
+<body style="background: rgba(20,20,20,100) !important;">
+<div class="login-form">
+    <form action="/products/admin/add" method="post">
+        <h2 class="text-center">ADD PRODUCT</h2>
+        <div class="form-group">
+            <input name="idProduct" min="0" type="number" class="form-control" placeholder="ID" required="required">
+        </div>
+        <div class="form-group">
+            <input name="nameProduct" type="text" class="form-control" placeholder="name of product" required="required">
+        </div>
+        <div class="form-group">
+            <input name="priceProduct" type="number" min="0" class="form-control" placeholder="Price" required="required">
+        </div>
+        <div class="form-group">
+            <input name="descriptionProduct" type="text"  class="form-control" placeholder="Description" required="required">
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">ADD</button>
+            <button type="reset" class="btn btn-primary btn-block">CLEAN</button>
+            <a href="/products/admin" class="btn btn-danger btn-lg btn-block add mt-4">CANCEL</a>
+
+        </div>
+    </form>
+
+</div>
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+</body>
+</html>
