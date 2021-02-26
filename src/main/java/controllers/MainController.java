@@ -5,8 +5,10 @@ import encapsulations.Product;
 import encapsulations.ShoppingCart;
 import encapsulations.User;
 import io.javalin.Javalin;
+import org.jasypt.util.text.StrongTextEncryptor;
 import services.DataBaseH2Services;
 
+import javax.servlet.http.Cookie;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -20,15 +22,6 @@ public class MainController {
 
     public MainController(Javalin app) throws SQLException {
         this.app = app;
-        /*User n = new User("anthony sakamoto","admin","admin");
-        storeController.addUser(n);
-        Product pNew = new Product(1,"LAPTOP HP", 40500.0,"THE BEST IN THE MARKET");
-        Product pNew1 = new Product(2,"IPHONE 8", 15000.0,"LIKE NEW");
-        Product pNew2 = new Product(3,"RASPBERRY PI 4", 5500.0,"KIT FULL");
-        storeController.addProduct(pNew);
-        storeController.addProduct(pNew1);
-        storeController.addProduct(pNew2);*/
-
     }
 
 
@@ -36,6 +29,17 @@ public class MainController {
         app.get("/", ctx -> ctx.redirect("/products"));
 
         app.routes(() -> {
+
+            before( ctx -> {
+                    if (ctx.cookie("user_remember") != null){
+                        StrongTextEncryptor stE = new StrongTextEncryptor();
+                        stE.setPassword("myEncryptionPassword");
+                        ctx.sessionAttribute("user",stE.decrypt(ctx.cookie("user_remember")));
+                    }
+                }
+
+            );
+
 
             path("/products", () -> {
 
@@ -59,7 +63,7 @@ public class MainController {
                 });
 
                 before("/admin", ctx -> {
-                    User auxUser = ctx.sessionAttribute("user");
+                    String auxUser = ctx.sessionAttribute("user");
                     if (auxUser == null){
                          tempURI = ctx.req.getRequestURI();
                         ctx.redirect("/login.html");
@@ -69,9 +73,6 @@ public class MainController {
                 get("/admin", ctx -> {
                     List<Product> listProduct = storeController.getListProduct();
                     Map<String, Object> model = new HashMap<>();
-                    User adminUser = ctx.sessionAttribute("user");
-
-                    model.put("adminUser", adminUser);
                     model.put("listProduct", listProduct);
 
                     if (ctx.sessionAttribute("cart") == null) {
@@ -89,7 +90,7 @@ public class MainController {
                 });
 
                 before("/saleshistory", ctx -> {
-                    User auxUser = ctx.sessionAttribute("user");
+                    String auxUser = ctx.sessionAttribute("user");
                     if (auxUser == null){
                         tempURI = ctx.req.getRequestURI();
                         ctx.redirect("/login.html");
@@ -122,6 +123,7 @@ public class MainController {
                 get("/delete/:id", ctx -> {
                     Integer id = ctx.pathParam("id",Integer.class).get();
                     storeController.deleteProduct(id);
+                    storeController.getListProduct().clear();
                     storeController.loadProduct();
                     ctx.redirect("/products/admin");
 
@@ -144,6 +146,7 @@ public class MainController {
                    String descrip = ctx.formParam("descriptionProduct");
 
                    storeController.editProduct(id,name,price,descrip);
+                   storeController.getListProduct().clear();
                    storeController.loadProduct();
 
                     ctx.redirect("/products/admin");
@@ -158,6 +161,7 @@ public class MainController {
 
                     Product p = new Product(id,name,price,descrip);
                     storeController.addProduct(p); //save to db
+                    storeController.getListProduct().clear();
                     storeController.loadProduct(); // load from db
 
                     ctx.redirect("/products/admin");
@@ -236,15 +240,21 @@ public class MainController {
                 post("/pay", ctx -> {
                     String name = ctx.formParam("name");
                     List<ShoppingCart> listProductCart = ctx.sessionAttribute("cart");
-                    Date date = new Date();
+                    Date date1 = new Date();
+                    java.sql.Date date = new java.sql.Date(date1.getTime());
                     int lastid = storeController.searchIdLastInvoice();
+                    System.out.println(lastid);
 
                     InvoiceProduct invp = new InvoiceProduct(name,date);
-                    float pr = invp.totalPrice();
+                    storeController.addProductToInvoice((lastid+1),listProductCart);
+                    float pr = 0.0f;
+                    for (ShoppingCart p : listProductCart) {
+                        pr += p.getProduct().getPrice()*p.getCant();
+                    }
+                    System.out.println(pr);
                     invp.setTotalPrice(pr);
-
                     storeController.addInvoice(invp);
-                    storeController.addProductToInvoice(lastid,listProductCart);
+                    storeController.getListSaleProduct().clear();
                     storeController.loadSalesHistory();
 
                     ctx.sessionAttribute("cart",null);
@@ -263,8 +273,16 @@ public class MainController {
                     User auxUser = storeController.searchUser(username,password);
                     if (auxUser == null){
                         ctx.redirect("/401.html");
+
                     }else{
-                        ctx.attribute("userFound", auxUser);
+                        ctx.attribute("userFound", auxUser.getUsername());
+
+                        if (ctx.formParam("chkRemember") != null){
+                            StrongTextEncryptor stE = new StrongTextEncryptor();
+                            stE.setPassword("myEncryptionPassword");
+                            String userEncryp = stE.encrypt(auxUser.getUsername());
+                            ctx.cookie("user_remember", userEncryp,604800);
+                        }
                     }
                 });
 
@@ -275,11 +293,23 @@ public class MainController {
 
             });
 
+            path("/logout", () -> {
+                get("/",ctx -> {
+                    if (ctx.sessionAttribute("user") != null){
+                        ctx.sessionAttribute("user",null);
+                        ctx.req.getSession().invalidate();
+                    }
+                    if (ctx.cookie("user_remember") != null){
+                        ctx.removeCookie("user_remember");
+                    }
+                    ctx.redirect("/");
+                });
+            });
 
             path("/products/admin/addproduct", () -> {
 
                 before("/", ctx -> {
-                    User auxUser = ctx.sessionAttribute("user");
+                    String auxUser = ctx.sessionAttribute("user");
                     if (auxUser == null){
                         tempURI = ctx.req.getRequestURI();
                         ctx.redirect("/login.html");

@@ -127,11 +127,11 @@ public class StoreController {
     }
 
     public void addInvoice(InvoiceProduct i) throws SQLException {
-        String sqlQuery = "INSERT INTO INVOICE(CLIENTNAME, CREATE_DATE, TOTAL_PRICE) values(?,?,?);";
+        String sqlQuery = "INSERT INTO INVOICE(CLIENTNAME, CREATED_DATE, TOTAL_PRICE) values(?,?,?);";
         Connection conn = DataBaseH2Services.getDataBaseConnection();
         PreparedStatement st = conn.prepareStatement(sqlQuery);
         st.setString(1,i.getClientName());
-        st.setDate(2, (Date) i.getDate());
+        st.setDate(2, i.getDate());
         st.setDouble(3, i.getTotalPrice());
 
         st.execute();
@@ -226,8 +226,6 @@ public class StoreController {
     }
 
     public void loadSalesHistory() throws SQLException {
-        ArrayList<ShoppingCart> auxList = new ArrayList<>();
-
         String sqlQuery = "SELECT * FROM INVOICE;";
         String sqlQuery1 = "SELECT * FROM INVOICEPRODUCT WHERE ID_INVOICE = ?;";
         Connection conn = DataBaseH2Services.getDataBaseConnection();
@@ -244,8 +242,9 @@ public class StoreController {
             invp.setId(id);
             invp.setTotalPrice(itotalp);
 
+            ArrayList<ShoppingCart> auxList = new ArrayList<>();
             PreparedStatement st1 = conn.prepareStatement(sqlQuery1);
-            st1.setInt(1,invp.getId());
+            st1.setInt(1,id);
             ResultSet rs1 = st1.executeQuery();
 
             while (rs1.next()) {
@@ -254,7 +253,7 @@ public class StoreController {
             }
 
             invp.addProduct(auxList);
-            this.listSaleProduct.add(invp);
+            listSaleProduct.add(invp);
             st1.close();
         }
         st.close();

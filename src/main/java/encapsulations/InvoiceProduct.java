@@ -1,7 +1,7 @@
 package encapsulations;
 
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class InvoiceProduct {
@@ -66,13 +66,6 @@ public class InvoiceProduct {
         this.listProduct = (ArrayList<ShoppingCart>) p;
     }
 
-    public float totalPrice() {
-        float totalPrice = 0.0f;
 
-        for (ShoppingCart p : listProduct) {
-            totalPrice += p.getProduct().getPrice()*p.getCant();
-        }
-        return totalPrice;
-    }
 }
 

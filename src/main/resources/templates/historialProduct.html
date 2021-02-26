@@ -49,6 +49,11 @@
                 <li class="nav-item">
                     <a id="cm" class="nav-link" href="/cart">Cart <span class="badge badge-pill badge-success"  th:text="${itemCant}"></span></a>
                 </li>
+                <li class="nav-item">
+                    <form method="get" action="/logout">
+                        <button type="submit" class="mt-4 btn btn-primary btn-md">LOGOUT</button>
+                    </form>
+                </li>
             </ul>
         </div>
     </div>

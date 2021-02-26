@@ -10,8 +10,8 @@ import java.sql.Statement;
 public class DataBaseH2Services {
 
     private final static String JDBC_DRIVER = "org.h2.Driver";
-    private  final static String DB_URL = "jdbc:h2:tcp://localhost/~/practica3";
-    private final static String user = "";
+    private  final static String DB_URL = "jdbc:h2:tcp://localhost/~/pract3";
+    private final static String user = "sa";
     private final static String password = "";
     private static Connection dbConnection = null;
 
@@ -34,6 +34,10 @@ public class DataBaseH2Services {
     public static void startDb() throws SQLException {
         server = Server.createTcpServer("-tcpPort", "9092", "-tcpAllowOthers", "-ifNotExists").start();
         System.out.println("[-] START DATABASE OK!");
+
+        String status = Server.createWebServer("-trace", "-webPort", "9090").start().getStatus();
+        System.out.println("Status Web: "+status);
+
     }
 
 
@@ -85,7 +89,7 @@ public class DataBaseH2Services {
     public static void createInvoiceTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS INVOICE\n" +
                 "(\n" +
-                " ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,\n" +
+                "ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,\n" +
                 "CLIENTNAME VARCHAR(100) NOT NULL,\n" +
                 "CREATED_DATE DATE NOT NULL,\n" +
                 "TOTAL_PRICE FLOAT NOT NULL\n" +
@@ -101,12 +105,10 @@ public class DataBaseH2Services {
     public static void createInvoiceProductRelTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS INVOICEPRODUCT\n" +
                 "(\n" +
-                " ID_INVOICE INTEGER NOT NULL,\n" +
+                "ID INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,\n" +
+                "ID_INVOICE INTEGER NOT NULL,\n" +
                 "ID_PRODUCT INTEGER NOT NULL,\n" +
-                "CANT INTEGER NOT NULL,\n" +
-                "FOREIGN KEY (ID_INVOICE) REFERENCES INVOICE(ID),\n" +
-                "FOREIGN KEY (ID_PRODUCT) REFERENCES PRODUCT(ID),\n" +
-                "PRIMARY KEY (ID_INVOICE, ID_PRODUCT)\n" +
+                "CANT INTEGER NOT NULL\n" +
                 ");";
         Connection conn = DataBaseH2Services.getDataBaseConnection();
         Statement st = conn.createStatement();
